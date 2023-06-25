@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-input-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4c9aff;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .file-input-label:hover {
+      background-color: #3885e3;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .preview-image {
+      width: 150px;
+      height: auto;
+      margin: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .convert-buttons {
+      margin-top: 20px;
+    }
+
+    .convert-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #43a047;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .convert-button:hover {
+      background-color: #388e3c;
+    }
+
+    .download-link {
+      display: none;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+
+      .preview-image {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Converter</h1>
+    <label for="fileInput" class="file-input-label">Upload Images</label>
+    <input type="file" id="fileInput" class="file-input" accept=".png" multiple>
+    <div class="preview-container" id="previewContainer"></div>
+    <div class="convert-buttons">
+      <button onclick="convertToJPG()" class="convert-button">Convert to JPG</button>
+      <button onclick="convertToWebP()" class="convert-button">Convert to WebP</button>
+    </div>
+    <a id="downloadLink" class="download-link" href="#" download></a>
+  </div>
+
+  <script>
+    function openFileInput() {
+      const fileInput = document.getElementById("fileInput");
+      fileInput.click();
+    }
+
+    function convertToJPG() {
+      const fileInput = document.getElementById("fileInput");
+      fileInput.accept = ".png, .jpg, .jpeg";
+      const files = Array.from(fileInput.files);
+      processFiles(files, "image/jpeg", "converted.jpg");
+    }
+
+    function convertToWebP() {
+      const fileInput = document.getElementById("fileInput");
+      fileInput.accept = ".png";
+      const files = Array.from(fileInput.files);
+      processFiles(files, "image/webp", "converted.webp");
+    }
+
+    function processFiles(files, mimeType, downloadFileName) {
+      const previewContainer = document.getElementById("previewContainer");
+      previewContainer.innerHTML = "";
+
+      files.forEach(function (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.className = "preview-image";
+          previewContainer.appendChild(img);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(function (blob) {
+            const downloadLink = document.getElementById("downloadLink");
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = downloadFileName;
+            downloadLink.click();
+          }, mimeType, 1);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      fileInput.value = "";
+    }
+  </script>
+</body>
+</html>
